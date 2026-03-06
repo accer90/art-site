@@ -894,7 +894,7 @@
                 <a href="#">Twitter</a>
                 <a href="#">Behance</a>
             </div>
-            <p>&copy; 2026 Your Name. All rights reserved.</p>
+            <p>&copy; 2026 Ace Artworks. All rights reserved.</p>
         </div>
     </footer>
 
@@ -931,8 +931,28 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // Dummy Initial Data
-            const initialArtworks = [];
+            // Artwork data (loaded from localStorage so it survives refresh)
+            let initialArtworks = [];
+            try {
+                const storedArt = localStorage.getItem('ace_artworks');
+                if (storedArt) {
+                    const parsed = JSON.parse(storedArt);
+                    if (Array.isArray(parsed)) {
+                        initialArtworks = parsed;
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not load saved artworks', err);
+                initialArtworks = [];
+            }
+
+            function persistArtworks() {
+                try {
+                    localStorage.setItem('ace_artworks', JSON.stringify(initialArtworks));
+                } catch (err) {
+                    console.warn('Could not save artworks', err);
+                }
+            }
 
             const galleryGrid = document.getElementById('galleryGrid');
             const filterBtns = document.querySelectorAll('.filter-btn');
@@ -985,8 +1005,28 @@
             const lightboxTitle = document.getElementById('lightboxTitle');
             const closeLightbox = document.getElementById('closeLightbox');
 
-            // Comments Logic
-            const commentsData = {};
+            // Comments Logic (also persisted in localStorage)
+            let commentsData = {};
+            try {
+                const storedComments = localStorage.getItem('ace_comments');
+                if (storedComments) {
+                    const parsed = JSON.parse(storedComments);
+                    if (parsed && typeof parsed === 'object') {
+                        commentsData = parsed;
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not load saved comments', err);
+                commentsData = {};
+            }
+
+            function persistComments() {
+                try {
+                    localStorage.setItem('ace_comments', JSON.stringify(commentsData));
+                } catch (err) {
+                    console.warn('Could not save comments', err);
+                }
+            }
             const commentsList = document.getElementById('commentsList');
             const commentForm = document.getElementById('commentForm');
             let currentArtId = null;
@@ -1023,6 +1063,9 @@
                     commentsData[currentArtId] = [];
                 }
                 commentsData[currentArtId].push({ author, text });
+
+                // Save updated comments
+                persistComments();
 
                 authorInput.value = '';
                 textInput.value = '';
@@ -1157,6 +1200,9 @@
 
                     // Add to beginning of array
                     initialArtworks.unshift(newArt);
+
+                    // Persist artworks so they survive refresh
+                    persistArtworks();
 
                     // Reset form and UI
                     selectedFile = null;
