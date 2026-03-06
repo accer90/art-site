@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Portfolio</title>
+    <meta name="description" content="Personal art portfolio and gallery">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fdf2f8;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --text-secondary: #4b5563;
+            --accent-color: #db2777;
+            /* Deep Pink Accent */
+            --card-bg: #ffffff;
+            --border-color: #fbcfe8;
+            --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+            --transition-smooth: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+            --font-heading: 'Cormorant Garamond', serif;
+            --font-body: 'Inter', sans-serif;
+
+            --spacing-sm: 1rem;
+            --spacing-md: 2rem;
+            --spacing-lg: 4rem;
+            --spacing-xl: 8rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(-45deg, #fdf2f8, #fce7f3, #fbcfe8, #fdf2f8);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-heading);
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: color var(--transition-smooth);
+        }
+
+        a:hover {
+            color: var(--accent-color);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Nav */
+        nav {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        /* Hero */
+        .hero {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 1.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            color: var(--text-muted);
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Gallery Section */
+        .gallery-section {
+            padding: var(--spacing-xl) 0;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: none;
+            border: none;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            position: relative;
+            transition: color var(--transition-smooth);
+        }
+
+        .filter-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 1px;
+            background-color: var(--accent-color);
+            transition: all var(--transition-smooth);
+            transform: translateX(-50%);
+        }
+
+        .filter-btn:hover {
+            color: var(--text-main);
+        }
+
+        .filter-btn.active {
+            color: var(--text-main);
+        }
+
+        .filter-btn.active::after {
+            width: 80%;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 4rem;
+            opacity: 1;
+            transition: opacity var(--transition-smooth);
+        }
+
+        .gallery-grid.filtering {
+            opacity: 0;
+        }
+
+        .gallery-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-subtle);
+            transition: all var(--transition-smooth);
+            cursor: pointer;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUpFade 0.8s forwards;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-img-wrapper {
+            aspect-ratio: 4/5;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .gallery-card:hover .card-img-wrapper img {
+            transform: scale(1.1);
+        }
+
+        .card-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 3rem 1.5rem 1.5rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+            text-align: center;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .gallery-card:hover .card-info {
+            transform: translateY(0);
+        }
+
+        .card-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.3rem;
+            font-family: var(--font-heading);
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-info p {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Upload Section */
+        .upload-section {
+            padding: var(--spacing-xl) 0;
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-panel {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .drop-zone {
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 4rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            margin-bottom: 2rem;
+            background-color: var(--bg-color);
+            position: relative;
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--accent-color);
+            background-color: var(--card-bg);
+        }
+
+        .drop-zone p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .drop-zone .icon {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: inherit;
+            background-color: var(--bg-color);
+            transition: border-color var(--transition-smooth);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .btn {
+            background-color: var(--text-main);
+            color: #ffffff;
+            border: none;
+            padding: 1rem 2rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background-color var(--transition-smooth);
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+        }
+
+        /* About Section */
+        .about-section {
+            padding: var(--spacing-xl) 0;
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .about-image {
+            flex: 1;
+            aspect-ratio: 3/4;
+            background-color: #eae8e3;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .about-content {
+            flex: 1;
+        }
+
+        .about-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(26, 26, 26, 0.95);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            transform: scale(0.95);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+
+        .lightbox.active .lightbox-content {
+            transform: scale(1);
+        }
+
+        .lightbox img {
+            max-height: 50vh;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .lightbox-info {
+            text-align: center;
+            color: #ffffff;
+            margin-top: 1.5rem;
+        }
+
+        .lightbox-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-heading);
+        }
+
+        .lightbox-info p {
+            color: #bfa780;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            z-index: 1001;
+        }
+
+        .close-btn:hover {
+            color: var(--accent-color);
+        }
+
+        /* Comments Section */
+        .comments-section {
+            margin-top: 1.5rem;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+            color: var(--text-main);
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .comments-section h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            color: var(--text-main);
+            font-family: var(--font-heading);
+        }
+
+        .comments-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding-right: 0.5rem;
+        }
+
+        .comments-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .comments-list::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-radius: 4px;
+        }
+
+        .comments-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .comment {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .comment .author {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+            color: var(--accent-color);
+        }
+
+        .comment .text {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            word-wrap: break-word;
+        }
+
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            padding-bottom: 1rem;
+        }
+
+        .comment-form input,
+        .comment-form textarea {
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: inherit;
+            resize: vertical;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        .comment-form input:focus,
+        .comment-form textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .comment-form .btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.85rem;
+            align-self: flex-end;
+        }
+
+        /* Toast (replaces browser alert popups) */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 1.25rem;
+            transform: translateX(-50%) translateY(14px);
+            z-index: 2000;
+            width: min(560px, calc(100vw - 2.5rem));
+            padding: 0.95rem 1.1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(17, 24, 39, 0.72);
+            color: #ffffff;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 180ms ease, transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            margin-top: 0.35rem;
+            background: var(--accent-color);
+            flex: 0 0 auto;
+            box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.25);
+        }
+
+        .toast.toast--error .dot {
+            background: #fb7185;
+            box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.22);
+        }
+
+        .toast.toast--success .dot {
+            background: #34d399;
+            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2);
+        }
+
+        .toast .msg {
+            font-size: 0.95rem;
+            line-height: 1.35;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .toast .toast-close {
+            margin-left: auto;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.85);
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem 0.4rem;
+            line-height: 1;
+            font-size: 1.15rem;
+            border-radius: 10px;
+            transition: background-color 180ms ease, color 180ms ease;
+        }
+
+        .toast .toast-close:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+
+        /* Animations */
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            :root {
+                --spacing-lg: 3rem;
+                --spacing-xl: 5rem;
+            }
+
+            .container {
+                padding: 0 1.5rem;
+            }
+
+            .about-section {
+                flex-direction: column;
+                gap: 3rem;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+            }
+
+            .gallery-grid {
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            :root {
+                --spacing-md: 1.5rem;
+                --spacing-lg: 2rem;
+                --spacing-xl: 3rem;
+            }
+
+            .container {
+                padding: 0 1.25rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1.5rem 0;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+                font-size: 0.8rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .hero {
+                height: 70vh;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .filters {
+                gap: 0.8rem;
+            }
+
+            .filter-btn {
+                font-size: 0.8rem;
+                padding: 0.4rem;
+            }
+
+            .about-content h2 {
+                font-size: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .drop-zone {
+                padding: 2rem 1rem;
+            }
+
+            .card-info {
+                padding: 2rem 1rem 1rem;
+            }
+
+            .lightbox-content {
+                max-width: 95%;
+            }
+
+            .close-btn {
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <nav>
+            <a href="#" class="logo">Aura</a>
+            <div class="nav-links">
+                <a href="#gallery">Gallery</a>
+                <a href="#upload">Upload</a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Hero -->
+    <header class="hero">
+        <h1>Ace</h1>
+        <p>Artist & Creator</p>
+    </header>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="gallery-section container">
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Items injected by JS -->
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section id="upload" class="upload-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Add to Collection</h2>
+                <p>Upload new artwork locally.</p>
+            </div>
+
+            <div class="upload-panel">
+                <div class="drop-zone" id="dropZone">
+                    <span class="icon">⊞</span>
+                    <p>Drag & drop image here or click to browse</p>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+
+                <div class="upload-form">
+                    <div class="form-group">
+                        <label for="artTitle">Artwork Title</label>
+                        <input type="text" id="artTitle" placeholder="e.g. Midnight Serenade">
+                    </div>
+
+                    <button class="btn" id="uploadBtn">Add Artwork</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="social-links">
+                <a href="https://www.instagram.com/ace78090/" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">Behance</a>
+            </div>
+            <p>&copy; 2026 Your Name. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="close-btn" id="closeLightbox">&times;</button>
+        <div class="lightbox-content">
+            <img src="" id="lightboxImg" alt="Enlarged Artwork">
+            <div class="lightbox-info">
+                <h3 id="lightboxTitle">Title</h3>
+            </div>
+
+            <div class="comments-section" id="commentsSection">
+                <h4>Comments</h4>
+                <div class="comments-list" id="commentsList">
+                    <!-- Comments injected here -->
+                </div>
+                <form id="commentForm" class="comment-form">
+                    <input type="text" id="commenterName" placeholder="Your Name" required>
+                    <textarea id="commentText" placeholder="Write a comment..." rows="2" required></textarea>
+                    <button type="submit" class="btn">Post Comment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container (for nice messages instead of alert()) -->
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">
+        <span class="dot" aria-hidden="true"></span>
+        <div class="msg" id="toastMsg"></div>
+        <button class="toast-close" id="toastClose" type="button" aria-label="Close">×</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Dummy Initial Data
+            const initialArtworks = [];
+
+            const galleryGrid = document.getElementById('galleryGrid');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+
+            // Render Gallery
+            function renderGallery() {
+                galleryGrid.classList.add('filtering');
+
+                setTimeout(() => {
+                    galleryGrid.innerHTML = '';
+
+                    initialArtworks.forEach((art, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'gallery-card';
+                        card.style.animationDelay = `${index * 0.1}s`;
+
+                        card.innerHTML = `
+                            <div class="card-img-wrapper">
+                                <img src="${art.src}" alt="${art.title}" loading="lazy">
+                            </div>
+                            <div class="card-info">
+                                <h3>${art.title}</h3>
+                            </div>
+                        `;
+
+                        // Open lightbox on click
+                        card.addEventListener('click', () => openLightbox(art));
+
+                        galleryGrid.appendChild(card);
+                    });
+
+                    galleryGrid.classList.remove('filtering');
+                }, 300); // match transition time
+            }
+
+            renderGallery();
+
+            // Filtering Logic
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderGallery(btn.dataset.filter);
+                });
+            });
+
+            // Lightbox Logic
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            const lightboxTitle = document.getElementById('lightboxTitle');
+            const closeLightbox = document.getElementById('closeLightbox');
+
+            // Comments Logic
+            const commentsData = {};
+            const commentsList = document.getElementById('commentsList');
+            const commentForm = document.getElementById('commentForm');
+            let currentArtId = null;
+
+            function loadComments(artId) {
+                commentsList.innerHTML = '';
+                const comments = commentsData[artId] || [];
+
+                if (comments.length === 0) {
+                    commentsList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">No comments yet. Be the first to comment!</p>';
+                } else {
+                    comments.forEach(c => {
+                        const div = document.createElement('div');
+                        div.className = 'comment';
+                        const author = c.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        const text = c.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        div.innerHTML = `<div class="author">${author}</div><div class="text">${text}</div>`;
+                        commentsList.appendChild(div);
+                    });
+                }
+            }
+
+            commentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const authorInput = document.getElementById('commenterName');
+                const textInput = document.getElementById('commentText');
+
+                const author = authorInput.value.trim();
+                const text = textInput.value.trim();
+
+                if (!author || !text || !currentArtId) return;
+
+                if (!commentsData[currentArtId]) {
+                    commentsData[currentArtId] = [];
+                }
+                commentsData[currentArtId].push({ author, text });
+
+                authorInput.value = '';
+                textInput.value = '';
+
+                loadComments(currentArtId);
+
+                setTimeout(() => {
+                    commentsList.scrollTop = commentsList.scrollHeight;
+                }, 50);
+            });
+
+            function openLightbox(art) {
+                lightboxImg.src = art.src;
+                lightboxTitle.textContent = art.title;
+                currentArtId = art.src;
+                loadComments(currentArtId);
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            }
+
+            function closeLightboxModal() {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+                setTimeout(() => {
+                    lightboxImg.src = ''; // Clear source after fade out
+                }, 500);
+            }
+
+            closeLightbox.addEventListener('click', closeLightboxModal);
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) closeLightboxModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeLightboxModal();
+            });
+
+            // Drag and Drop Upload Logic
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const titleInput = document.getElementById('artTitle');
+
+            let selectedFile = null;
+
+            // Toast UI (replaces ugly alert popups)
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastClose = document.getElementById('toastClose');
+            let toastTimer = null;
+
+            function showToast(message, variant = 'info', durationMs = 2600) {
+                if (!toast || !toastMsg) return;
+
+                toast.classList.remove('toast--error', 'toast--success');
+                if (variant === 'error') toast.classList.add('toast--error');
+                if (variant === 'success') toast.classList.add('toast--success');
+
+                toastMsg.textContent = message;
+                toast.classList.add('show');
+
+                if (toastTimer) window.clearTimeout(toastTimer);
+                toastTimer = window.setTimeout(() => {
+                    toast.classList.remove('show');
+                }, durationMs);
+            }
+
+            if (toastClose && toast) {
+                toastClose.addEventListener('click', () => toast.classList.remove('show'));
+            }
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Highlight drop zone
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.remove('dragover');
+                }, false);
+            });
+
+            // Handle dropped files
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }, false);
+
+            // Handle file input change
+            fileInput.addEventListener('change', function () {
+                handleFiles(this.files);
+            });
+
+            function handleFiles(files) {
+                if (files.length > 0 && files[0].type.startsWith('image/')) {
+                    selectedFile = files[0];
+                    dropZone.querySelector('p').textContent = `Selected: ${selectedFile.name}`;
+                    showToast('Image selected. Ready to add artwork.', 'success', 1800);
+                } else {
+                    showToast('Please select a valid image file.', 'error');
+                }
+            }
+
+            // Upload Button Click
+            uploadBtn.addEventListener('click', () => {
+                const title = titleInput.value.trim() || 'Untitled Artwork';
+
+                if (!selectedFile) {
+                    showToast('Please select or drop an image first.', 'error');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const newArt = {
+                        title: title,
+                        src: e.target.result
+                    };
+
+                    // Add to beginning of array
+                    initialArtworks.unshift(newArt);
+
+                    // Reset form and UI
+                    selectedFile = null;
+                    dropZone.querySelector('p').textContent = 'Drag & drop image here or click to browse';
+                    titleInput.value = '';
+                    fileInput.value = '';
+
+                    // Re-render gallery
+                    renderGallery();
+
+                    // Scroll to gallery seamlessly
+                    document.getElementById('gallery').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    showToast('Artwork added to your gallery.', 'success', 2200);
+                }
+
+                reader.readAsDataURL(selectedFile);
+            });
+        });
+    </script>
+</body>
+
+</html>
